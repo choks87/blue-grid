@@ -9,6 +9,7 @@
         <env name="KERNEL_CLASS" value="BlueGrid\Kernel"/>
         <server name="APP_ENV" value="test" force="true"/>
         <server name="SHELL_VERBOSITY" value="-1"/>
+        <server name="SYMFONY_DEPRECATIONS_HELPER" value="weak"/>
     </php>
 
     <testsuites>

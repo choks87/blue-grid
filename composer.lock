@@ -75,16 +75,16 @@
         },
         {
             "name": "controlbit/dto-mapper",
-            "version": "v0.1",
+            "version": "v0.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/controlbit/dto-mapper.git",
-                "reference": "738e68930a8b3a7403707a2e279ef7d81f7c0729"
+                "reference": "2e9101b9d8ef4c1bfdf37e0ee9a61a9f6e1eca78"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/controlbit/dto-mapper/zipball/738e68930a8b3a7403707a2e279ef7d81f7c0729",
-                "reference": "738e68930a8b3a7403707a2e279ef7d81f7c0729",
+                "url": "https://api.github.com/repos/controlbit/dto-mapper/zipball/2e9101b9d8ef4c1bfdf37e0ee9a61a9f6e1eca78",
+                "reference": "2e9101b9d8ef4c1bfdf37e0ee9a61a9f6e1eca78",
                 "shasum": ""
             },
             "require": {
@@ -124,9 +124,9 @@
             ],
             "support": {
                 "issues": "https://github.com/controlbit/dto-mapper/issues",
-                "source": "https://github.com/controlbit/dto-mapper/tree/v0.1"
+                "source": "https://github.com/controlbit/dto-mapper/tree/v0.1.1"
             },
-            "time": "2025-03-14T16:58:23+00:00"
+            "time": "2025-03-14T20:24:42+00:00"
         },
         {
             "name": "doctrine/cache",
