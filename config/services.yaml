@@ -1,0 +1,104 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+    web_disk_base_url: https://rest-test-eight.vercel.app/api
+    cache_ttl: 84000
+    data_loader_batch_size: 10
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        public: true
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    _instanceof:
+        BlueGrid\Contract\TransformTypeSupportiveInterface:
+            tags: [ 'app.transform_typed' ]
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    BlueGrid\Event\:
+        resource: '../src/Event'
+
+    BlueGrid\DataFixtures\:
+        resource: '../src/DataFixtures'
+
+    BlueGrid\Controller\:
+        resource: '../src/Controller'
+
+    BlueGrid\Service\:
+        resource: '../src/Service'
+        exclude:
+            - '../src/Service/CachedWebDiskApi.php'
+
+    BlueGrid\Repository\:
+        resource: '../src/Repository'
+
+    BlueGrid\Transformer\:
+        resource: '../src/Transformer'
+
+    BlueGrid\Repository\TreeRepository:
+        arguments:
+            $transformers: !tagged_iterator app.transform_typed
+            $cacheTtl: '%cache_ttl%'
+
+    BlueGrid\Command\:
+      resource: '../src/Command'
+      tags: ['console.command']
+
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones
+
+    # Event Listeners & Subscribers
+    BlueGrid\Event\Listener\ApiExceptionListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception, priority: -10 }
+
+    # Web Disk related Services and loaders of data
+    BlueGrid\Service\WebDiskApi:
+        arguments:
+            $baseUrl: '%web_disk_base_url%'
+
+    BlueGrid\Contract\WebDiskApiInterface: '@BlueGrid\Service\WebDiskApi'
+
+    BlueGrid\Service\DataLoader:
+        arguments:
+            $batchSize: '%data_loader_batch_size%'
+            $environment: '%kernel.environment%'
+
+    # Doctrine Related
+    BlueGrid\Service\UuidGenerator:
+        decorates: doctrine.uuid_generator
+        arguments: ['@.inner']
+
+when@dev:
+    parameters:
+        # This is made only under development environment in order to save time and put
+        # less stress on external server due to possible API limit we could reach.
+        cache_ttl: 1
+        cache_key_web_disk: 'web_disk_all_data' # Dev Only
+        cache_ttl_web_disk: 86400
+
+    services:
+        BlueGrid\Service\CachedWebDiskApi:
+            decorates: BlueGrid\Contract\WebDiskApiInterface
+            arguments:
+                $webDiskApi: '@.inner'
+                $cache: '@cache.app'
+                $allDataCacheKey: '%cache_key_web_disk%'
+                $cacheTtl: '%cache_ttl_web_disk%'
+
+when@prod:
+    parameters:
+        cache_ttl_web_disk: 300
+        cache_ttl: 60
+        data_loader_batch_size: 1000
+
+when@test:
+    services:
+        BlueGrid\Tests\Resources\MockedWebDiskApi: ~
+        BlueGrid\Contract\WebDiskApiInterface: '@BlueGrid\Tests\Resources\MockedWebDiskApi'

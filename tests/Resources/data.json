@@ -1,0 +1,22 @@
+{
+  "items": [
+    {
+      "fileUrl": "http://192.168.0.1:48183/foo/"
+    },
+    {
+      "fileUrl": "http://192.168.0.1:48183/foo/bar/"
+    },
+    {
+      "fileUrl": "http://192.168.0.1:48183/foo/baz/"
+    },
+    {
+      "fileUrl": "http://192.168.0.1:48183/foo/baz/waldoo.txt"
+    },
+    {
+      "fileUrl": "http://192.168.0.2:48183/foo/"
+    },
+    {
+      "fileUrl": "http://192.168.0.2:48183/foo/waldoo.txt"
+    }
+  ]
+}

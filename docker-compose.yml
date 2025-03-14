@@ -1,0 +1,54 @@
+services:
+  php:
+    container_name: blue-php
+    hostname: blue-php
+    build:
+      context: ./docker/php
+      target: development
+    ports:
+      - "9501:9501"
+    expose:
+      - 9000
+    volumes:
+      - ./:/app
+      - ~/.bash_history:/root/.bash_history
+    environment:
+      PHP_IDE_CONFIG: "serverName=blue-php"
+    tty: true
+
+  blue-nginx:
+    container_name: blue-nginx
+    hostname: blue-nginx
+    build:
+      context: ./docker/nginx
+    volumes:
+      - ./:/var/www
+    depends_on:
+      - php
+    ports:
+      - "80:80"
+    tty: true
+
+  blue-database:
+    image: mysql/mysql-server:latest
+    container_name: blue-db
+    hostname: blue-db
+    volumes:
+      - ./var/db:/var/lib/mysql:rw
+    ports:
+      - "3306:3306"
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: db
+      MYSQL_USER: db
+      MYSQL_PASSWORD: db
+
+  redis:
+    container_name: blue-redis
+    hostname: blue-redis
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --save 60 1 --loglevel warning

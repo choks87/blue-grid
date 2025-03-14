@@ -1,0 +1,99 @@
+{
+    "type": "project",
+    "license": "proprietary",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=8.2",
+        "ext-ctype": "*",
+        "ext-iconv": "*",
+        "ext-pcntl": "*",
+        "controlbit/dto-mapper": "^0.1.0",
+        "doctrine/doctrine-bundle": "^2.10",
+        "doctrine/orm": "^2.16",
+        "nelmio/api-doc-bundle": "^4.12",
+        "phpdocumentor/reflection-docblock": "^5.3",
+        "phpstan/phpdoc-parser": "^1.24",
+        "symfony/asset": "*",
+        "symfony/console": "*",
+        "symfony/dotenv": "*",
+        "symfony/flex": "*",
+        "symfony/framework-bundle": "*",
+        "symfony/http-client": "7.2.*",
+        "symfony/mailer": "*",
+        "symfony/property-access": "*",
+        "symfony/property-info": "*",
+        "symfony/runtime": "*",
+        "symfony/serializer": "*",
+        "symfony/twig-bundle": "7.2.*",
+        "symfony/uid": "*",
+        "symfony/validator": "*",
+        "symfony/yaml": "*",
+        "tbn/swoole-bundle": "^0.14"
+    },
+    "require-dev": {
+        "dama/doctrine-test-bundle": "*",
+        "doctrine/doctrine-fixtures-bundle": "*",
+        "eaglewu/swoole-ide-helper": "dev-master@dev",
+        "infection/infection": "^0.27.3",
+        "phpmd/phpmd": "*",
+        "phpstan/phpstan": "*",
+        "phpstan/phpstan-phpunit": "*",
+        "phpstan/phpstan-symfony": "*",
+        "phpunit/phpunit": "*",
+        "roave/security-advisories": "dev-latest",
+        "rregeer/phpunit-coverage-check": "*",
+        "symfony/browser-kit": "*",
+        "symfony/maker-bundle": "*",
+        "symfony/phpunit-bridge": "*"
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true,
+            "symfony/flex": true,
+            "symfony/runtime": true,
+            "infection/extension-installer": true
+        },
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "BlueGrid\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "BlueGrid\\Tests\\": "tests/"
+        }
+    },
+    "replace": {
+        "symfony/polyfill-ctype": "*",
+        "symfony/polyfill-iconv": "*",
+        "symfony/polyfill-php72": "*",
+        "symfony/polyfill-php73": "*",
+        "symfony/polyfill-php74": "*",
+        "symfony/polyfill-php80": "*",
+        "symfony/polyfill-php81": "*"
+    },
+    "scripts": {
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+        },
+        "post-install-cmd": [
+            "@auto-scripts"
+        ],
+        "post-update-cmd": [
+            "@auto-scripts"
+        ]
+    },
+    "conflict": {
+        "symfony/symfony": "*"
+    },
+    "extra": {
+        "symfony": {
+            "allow-contrib": false,
+            "require": "7.2.*"
+        }
+    }
+}

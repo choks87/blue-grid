@@ -1,0 +1,19 @@
+parameters:
+    level: max
+    excludePaths:
+        - var/*
+    paths:
+        - src
+    bootstrapFiles:
+        - phpstan.bootstrap.php
+    symfony:
+        containerXmlPath: var/cache/dev/BlueGrid_KernelDevDebugContainer.xml
+    scanDirectories:
+            - var/cache/dev/Symfony/Config
+    scanFiles:
+            - vendor/symfony/dependency-injection/Loader/Configurator/ContainerConfigurator.php
+includes:
+    - vendor/phpstan/phpstan-phpunit/extension.neon
+    - vendor/phpstan/phpstan-phpunit/rules.neon
+    - vendor/phpstan/phpstan-symfony/extension.neon
+    - vendor/phpstan/phpstan-symfony/rules.neon

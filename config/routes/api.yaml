@@ -1,0 +1,6 @@
+api_controllers:
+    resource: '../../src/Controller/Api'
+    prefix: api/
+    type: attribute
+    defaults:
+        _format: json

@@ -1,0 +1,12 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: API Documentation
+            version: 1.0.0
+        tags:
+            - name: "Filesystem"
+              description: "Web Disk Filesystem structure information"
+    areas: # to filter documented areas
+        default:
+            disable_default_routes: true
+
