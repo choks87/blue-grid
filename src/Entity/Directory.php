@@ -5,26 +5,53 @@ namespace BlueGrid\Entity;
 
 use BlueGrid\Contract\UuidIdentifiableInterface;
 use BlueGrid\Traits\UuidIdentifiableTrait;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
 
-#[ORM\Entity]
+/**
+ * @SuppressWarnings("PHPMD.UnusedPrivateField")
+ */
+#[Gedmo\Tree(type: 'nested')]
+#[ORM\Entity(repositoryClass: NestedTreeRepository::class)]
 class Directory implements UuidIdentifiableInterface
 {
     use UuidIdentifiableTrait;
 
-    #[ORM\Column(length: 256, nullable: true)]
+    #[ORM\Column(length: 255)]
     private ?string $name;
 
-    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'directories')]
-    private ?self $parent = null;
+    #[Gedmo\TreeLeft]
+    #[ORM\Column(type: Types::INTEGER)]
+    private int $lft; // @phpstan-ignore-line
+
+    #[Gedmo\TreeLevel]
+    #[ORM\Column(type: Types::INTEGER)]
+    private int $level; // @phpstan-ignore-line
+
+    #[Gedmo\TreeRight]
+    #[ORM\Column(type: Types::INTEGER)]
+    private int $rgt; // @phpstan-ignore-line
+
+    #[Gedmo\TreeRoot]
+    #[ORM\ManyToOne(targetEntity: self::class)]
+    #[ORM\JoinColumn(referencedColumnName: 'id', onDelete: 'CASCADE')]
+    private ?self $root; // @phpstan-ignore-line
+
+    #[Gedmo\TreeParent]
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'children')]
+    #[ORM\JoinColumn(referencedColumnName: 'id', onDelete: 'CASCADE')]
+    private ?self $parent; // @phpstan-ignore-line
 
     /**
-     * @var Collection<int, Directory>
+     * @var Collection<int, self>
      */
-    #[ORM\OneToMany(mappedBy: 'parent', targetEntity: Directory::class, cascade: ['persist', 'remove'])]
-    private Collection $directories;
+    #[ORM\OneToMany(mappedBy: 'parent', targetEntity: self::class, cascade: ['persist', 'remove'])]
+    #[ORM\OrderBy(['lft' => 'ASC'])]
+    private Collection $children;
 
     /**
      * @var Collection<int, File>
@@ -34,9 +61,9 @@ class Directory implements UuidIdentifiableInterface
 
     public function __construct(string $name = null)
     {
-        $this->directories = new ArrayCollection();
-        $this->files       = new ArrayCollection();
-        $this->name        = $name;
+        $this->files    = new ArrayCollection();
+        $this->children = new ArrayCollection();
+        $this->name     = $name;
     }
 
     public function getName(): ?string
@@ -44,11 +71,15 @@ class Directory implements UuidIdentifiableInterface
         return $this->name;
     }
 
-    public function setName(?string $name): static
+    public function getRoot(): ?self
     {
-        $this->name = $name;
+        return $this->root;
+    }
 
-        return $this;
+    public function setParent(self $parent): void
+    {
+        $this->parent = $parent;
+        $this->parent->addChild($this);
     }
 
     public function getParent(): ?self
@@ -56,40 +87,33 @@ class Directory implements UuidIdentifiableInterface
         return $this->parent;
     }
 
-    public function setParent(?self $parent): static
-    {
-        $this->parent = $parent;
-
-        return $this;
-    }
-
     /**
-     * @return Collection<int, Directory>
+     * @return Collection<int, self>
      */
-    public function getDirectories(): Collection
+    public function getChildren(): Collection
     {
-        return $this->directories;
+        return $this->children;
     }
 
-    public function addDirectory(Directory $directory): self
+    public function findChild(string $title): ?self
     {
-        if (!$this->directories->contains($directory)) {
-            $this->directories->add($directory);
-            $directory->setParent($this);
-        }
-
-        return $this;
-    }
-
-    public function getDirectory(string $name): ?Directory
-    {
-        foreach ($this->directories as $directory) {
-            if ($name === $directory->getName()) {
-                return $directory;
+        foreach ($this->children as $child) {
+            if ($child->getName() === $title) {
+                return $child;
             }
         }
 
         return null;
+    }
+
+    public function addChild(self $child): self
+    {
+        if (!$this->children->contains($child)) {
+            $this->children->add($child);
+            $child->setParent($this);
+        }
+
+        return $this;
     }
 
     /**
@@ -108,10 +132,5 @@ class Directory implements UuidIdentifiableInterface
         }
 
         return $this;
-    }
-
-    public function isRoot(): bool
-    {
-        return null === $this->parent;
     }
 }

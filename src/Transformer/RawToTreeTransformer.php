@@ -7,11 +7,10 @@ namespace BlueGrid\Transformer;
 use BlueGrid\Contract\TransformerInterface;
 use BlueGrid\Entity\Directory;
 use BlueGrid\Entity\File;
-use BlueGrid\Entity\Host;
 
 /**
  * @psalm-import-type Files from \BlueGrid\Contract\WebDiskApiInterface
- * @psalm-type Tree = array<Host>
+ * @psalm-type Tree = array<Directory>
  */
 final class RawToTreeTransformer implements TransformerInterface
 {
@@ -31,11 +30,9 @@ final class RawToTreeTransformer implements TransformerInterface
             $hostName = $parts['host']; // @phpstan-ignore-line
             $path     = $parts['path']; // @phpstan-ignore-line
 
-            $tree[$hostName] ??= new Host($hostName);
+            $tree[$hostName] ??= new Directory($hostName);
 
-            $rootDirectory = $this->getRootDirectory($tree[$hostName]);
-
-            $this->applyPathAsDirectories($rootDirectory, $path);
+            $this->applyPathAsDirectories($tree[$hostName], $path);
         }
 
         return \array_values($tree);
@@ -55,23 +52,14 @@ final class RawToTreeTransformer implements TransformerInterface
                 return;
             }
 
-            $directory = $temp->getDirectory($segment);
+            $directory = $temp->findChild($segment);
 
             if (null === $directory) {
                 $directory = new Directory($segment);
-                $temp->addDirectory($directory);
+                $directory->setParent($temp);
             }
 
             $temp = $directory;
         }
-    }
-
-    private function getRootDirectory(Host $host): Directory
-    {
-        if (null === $host->getRootDirectory()) {
-            $host->setRootDirectory(new Directory());
-        }
-
-        return $host->getRootDirectory(); // @phpstan-ignore-line
     }
 }

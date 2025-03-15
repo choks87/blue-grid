@@ -6,8 +6,11 @@ namespace BlueGrid\Repository;
 use BlueGrid\Contract\TransformTypeSupportiveInterface;
 use BlueGrid\Criteria\Criteria;
 use BlueGrid\Dto\PaginatedResult;
+use BlueGrid\Entity\Directory;
 use BlueGrid\Exception\UnsupportedTransformType;
 use BlueGrid\Service\DataLoader;
+use Doctrine\ORM\EntityManagerInterface;
+use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
@@ -21,7 +24,7 @@ final class TreeRepository
      */
     public function __construct(
         private iterable               $transformers,
-        private HostRepository         $hostRepository,
+        private EntityManagerInterface   $entityManager,
         private TagAwareCacheInterface $cache,
         private DataLoader             $dataLoader,
         private int                    $cacheTtl,
@@ -47,9 +50,7 @@ final class TreeRepository
                 }
 
                 /** @var TreeAsArray $data */
-                $data = $transformer->transform(
-                    $this->hostRepository->findAllWithCriteria($criteria)
-                );
+                $data = $transformer->transform($this->getRootDirectories($criteria));
 
                 return new PaginatedResult(
                     $data,
@@ -71,6 +72,25 @@ final class TreeRepository
             $criteria->getPagination()->getPage(),
             $criteria->getPagination()->getPerPage()
         );
+
+    }
+
+    /**
+     * @return array<Directory>
+     */
+    private function getRootDirectories(Criteria $criteria): array
+    {
+        $nestedRepository = $this->entityManager->getRepository(Directory::class);
+        $pagination = $criteria->getPagination();
+
+        /** @var array<Directory> $sliced */
+        $sliced = \array_slice(
+            $nestedRepository->getRootNodes(), // @phpstan-ignore-line
+            ($pagination->getPage() - 1) * $pagination->getPerPage(),
+            $pagination->getPerPage(),
+        );
+
+        return $sliced;
 
     }
 }

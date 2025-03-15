@@ -6,9 +6,9 @@ namespace BlueGrid\Service;
 use BlueGrid\Contract\WebDiskApiInterface;
 use BlueGrid\Entity\Directory;
 use BlueGrid\Entity\File;
-use BlueGrid\Entity\Host;
 use BlueGrid\Transformer\RawToTreeTransformer;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception\SyntaxErrorException;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
@@ -30,7 +30,7 @@ final readonly class DataLoader
     {
         $paths = $this->webDiskApi->getAllPaths();
 
-        /** @var array<Host> $tree */
+        /** @var array<Directory> $tree */
         $tree = $this->treeTransformer->transform($paths);
 
         /*
@@ -60,7 +60,10 @@ final readonly class DataLoader
 
             $this->logger->info('External Data successfully loaded.');
 
+        }catch (SyntaxErrorException $e) {
+            dd($e);
         } catch (\Exception $e) {
+
             $this->logger->error(\sprintf('Failed to Load External Data. Reason: %s', $e->getMessage()));
         }
 
@@ -75,7 +78,6 @@ final readonly class DataLoader
 
         $this->truncateTableForEntity(File::class);
         $this->truncateTableForEntity(Directory::class);
-        $this->truncateTableForEntity(Host::class);
     }
 
     private function truncateTableForEntity(string $entityFqcn): void

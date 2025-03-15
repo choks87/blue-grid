@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace BlueGrid\Transformer\TransformTyped;
 
 use BlueGrid\Entity\Directory;
-use BlueGrid\Entity\Host;
 use BlueGrid\Enum\TransformType;
 
 /**
- * @psalm-type Tree = array<Host>
+ * @psalm-type Tree = array<Directory>
  */
 final class TreeFilesToArrayTransformer extends TreeToArrayTransformer
 {
@@ -25,7 +24,7 @@ final class TreeFilesToArrayTransformer extends TreeToArrayTransformer
     protected function getNested(Directory $directory): array
     {
         $items = [];
-        foreach ($directory->getDirectories() as $subDirectory) {
+        foreach ($directory->getChildren() as $subDirectory) {
             $items = \array_merge($items, $this->getNested($subDirectory));
 
             foreach ($subDirectory->getFiles() as $file) {

@@ -3,29 +3,25 @@
 declare(strict_types=1);
 
 namespace BlueGrid\Transformer\TransformTyped;
-;
 
-use BlueGrid\Contract\TransformerInterface;
 use BlueGrid\Contract\TransformTypeSupportiveInterface;
 use BlueGrid\Entity\Directory;
-use BlueGrid\Entity\Host;
 use BlueGrid\Enum\TransformType;
 
 /**
- * @psalm-type Tree = array<Host>
+ * @psalm-type Tree = array<Directory>
  */
 class TreeToArrayTransformer implements TransformTypeSupportiveInterface
 {
     /**
-     * @param  array<Host>  $value
+     * @param  array<Directory>  $value
      * @return array<string, mixed>
      */
     public function transform(mixed $value): mixed
     {
         $array = [];
-        foreach ($value as $host) {
-            // @phpstan-ignore-next-line
-            $array[$host->getName()] = $this->getNested($host->getRootDirectory());
+        foreach ($value as $directory) {
+            $array[$directory->getName()] = $this->getNested($directory);
         }
 
         return $array;
@@ -43,7 +39,7 @@ class TreeToArrayTransformer implements TransformTypeSupportiveInterface
     {
         $items = [];
 
-        foreach ($directory->getDirectories() as $subDirectory) {
+        foreach ($directory->getChildren() as $subDirectory) {
             $items[$subDirectory->getName()] = $this->getNested($subDirectory);
         }
 
