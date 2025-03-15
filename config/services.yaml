@@ -76,7 +76,6 @@ when@dev:
     parameters:
         # This is made only under development environment in order to save time and put
         # less stress on external server due to possible API limit we could reach.
-        env(CACHE_TTL): '1'
         cache_key_web_disk: 'web_disk_all_data' # Dev Only
         cache_ttl_web_disk: 86400
 

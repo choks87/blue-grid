@@ -20,6 +20,7 @@ setup:
 	${DOCKER_COMPOSE_BUILD} && \
 	${DOCKER_COMPOSE_UP} && \
 	${DOCKER_RUN_COMMAND} composer install
+	${DOCKER_RUN_COMMAND} ${CONSOLE} doctrine:schema:update -f
 
 start:
 	${DOCKER_COMPOSE_UP} && \
@@ -28,6 +29,7 @@ start:
 start-prod:
 	docker compose -f docker-compose.yml -f docker-compose-prod.yml build --no-cache && \
 	docker compose -f docker-compose.yml -f docker-compose-prod.yml up -d --force-recreate --remove-orphans
+	docker compose -f docker-compose.yml -f docker-compose-prod.yml exec php bin/console doctrine:schema:update -f
 	docker compose -f docker-compose.yml -f docker-compose-prod.yml exec php bin/console app:load-external-data --no-interaction
 
 up:
