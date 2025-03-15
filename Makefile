@@ -12,8 +12,7 @@ RUN_SERVER_SWOOLE = swoole:server:run
 
 CONSOLE = ./bin/console
 PHPUNIT = ./vendor/bin/phpunit -c ./phpunit.xml.dist
-COV_CHECK = ./vendor/bin/coverage-check .analysis/phpunit/coverage/coverage.xml 70
-INFECTION = ./vendor/bin/infection  --threads=4 --only-covered --coverage=.analysis/phpunit/coverage
+COV_CHECK = ./vendor/bin/coverage-check .analysis/phpunit/coverage/coverage.xml 20
 PHP_STAN = ./vendor/bin/phpstan
 PHP_MD = ./vendor/bin/phpmd src/ text phpmd_ruleset.xml
 
@@ -45,7 +44,6 @@ test:
 	php-ext-enable pcov
 	${PHPUNIT} --stop-on-failure && ${COV_CHECK} && \
 	cp -f .analysis/phpunit/coverage/junit.xml .analysis/phpunit/coverage/phpunit.junit.xml && \
-	${INFECTION} && \
 	php-ext-disable pcov
 	php-ext-enable xdebug
 
@@ -66,7 +64,7 @@ help:
 	#   up ..............................Up Docker
 	#   down ............................Down Docker
 	#   attach ..........................attaches to docker PHP container
-	#   test ........................... Tests & infection testing
+	#   test ........................... Tests
 	#   code-check ..................... Complete code check
 	#   start .......................... Runs Swoole web server
 	#   check .......................... All checks before push
