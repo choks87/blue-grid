@@ -3,7 +3,7 @@
 # USER VARIABLES / PROJECT VARIABLES
 PHP_CONTAINER_NAME = blue-php
 
-DOCKER_COMPOSE = docker compose
+DOCKER_COMPOSE = docker compose -f docker-compose.yml -f docker-compose-dev.yml
 DOCKER_COMPOSE_UP =  ${DOCKER_COMPOSE} up -d --force-recreate --remove-orphans
 DOCKER_COMPOSE_BUILD = ${DOCKER_COMPOSE} build --no-cache
 DOCKER_COMPOSE_DOWN =  ${DOCKER_COMPOSE} down
@@ -23,7 +23,13 @@ setup:
 	${DOCKER_RUN_COMMAND} composer install
 
 start:
+	${DOCKER_COMPOSE_UP} && \
 	${DOCKER_RUN_COMMAND} ${CONSOLE} ${RUN_SERVER_SWOOLE}
+
+start-prod:
+	docker compose -f docker-compose.yml -f docker-compose-prod.yml build --no-cache && \
+	docker compose -f docker-compose.yml -f docker-compose-prod.yml up -d --force-recreate --remove-orphans
+	docker compose -f docker-compose.yml -f docker-compose-prod.yml exec php bin/console app:load-external-data --no-interaction
 
 up:
 	${DOCKER_COMPOSE_UP}

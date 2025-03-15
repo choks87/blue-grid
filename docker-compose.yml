@@ -2,19 +2,11 @@ services:
   php:
     container_name: blue-php
     hostname: blue-php
-    build:
-      context: ./docker/php
-      target: development
-    ports:
-      - "9501:9501"
-    expose:
-      - 9000
-    volumes:
-      - ./:/app
-      - ~/.bash_history:/root/.bash_history
-    environment:
-      PHP_IDE_CONFIG: "serverName=blue-php"
+    depends_on:
+      - blue-database
+      - redis
     tty: true
+
 
   blue-nginx:
     container_name: blue-nginx

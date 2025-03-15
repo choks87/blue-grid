@@ -4,9 +4,9 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-    web_disk_base_url: https://rest-test-eight.vercel.app/api
-    cache_ttl: 84000
-    data_loader_batch_size: 10
+    env(EXTERNAL_API_BASE_URL): https://rest-test-eight.vercel.app/api
+    env(CACHE_TTL): '300'
+    env(LOAD_BATCH_SIZE): '1000'
 
 services:
     # default configuration for services in *this* file
@@ -23,9 +23,6 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     BlueGrid\Event\:
         resource: '../src/Event'
-
-    BlueGrid\DataFixtures\:
-        resource: '../src/DataFixtures'
 
     BlueGrid\Controller\:
         resource: '../src/Controller'
@@ -44,7 +41,7 @@ services:
     BlueGrid\Repository\TreeRepository:
         arguments:
             $transformers: !tagged_iterator app.transform_typed
-            $cacheTtl: '%cache_ttl%'
+            $cacheTtl: '%env(CACHE_TTL)%'
 
     BlueGrid\Command\:
       resource: '../src/Command'
@@ -61,13 +58,13 @@ services:
     # Web Disk related Services and loaders of data
     BlueGrid\Service\WebDiskApi:
         arguments:
-            $baseUrl: '%web_disk_base_url%'
+            $baseUrl: '%env(EXTERNAL_API_BASE_URL)%'
 
     BlueGrid\Contract\WebDiskApiInterface: '@BlueGrid\Service\WebDiskApi'
 
     BlueGrid\Service\DataLoader:
         arguments:
-            $batchSize: '%data_loader_batch_size%'
+            $batchSize: '%env(LOAD_BATCH_SIZE)%'
             $environment: '%kernel.environment%'
 
     # Doctrine Related
@@ -79,7 +76,7 @@ when@dev:
     parameters:
         # This is made only under development environment in order to save time and put
         # less stress on external server due to possible API limit we could reach.
-        cache_ttl: 1
+        env(CACHE_TTL): '1'
         cache_key_web_disk: 'web_disk_all_data' # Dev Only
         cache_ttl_web_disk: 86400
 
@@ -90,13 +87,7 @@ when@dev:
                 $webDiskApi: '@.inner'
                 $cache: '@cache.app'
                 $allDataCacheKey: '%cache_key_web_disk%'
-                $cacheTtl: '%cache_ttl_web_disk%'
-
-when@prod:
-    parameters:
-        cache_ttl_web_disk: 300
-        cache_ttl: 60
-        data_loader_batch_size: 1000
+                $cacheTtl: '%env(CACHE_TTL)%'
 
 when@test:
     services:

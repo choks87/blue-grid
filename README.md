@@ -15,9 +15,9 @@ To attach to container:
 sudo make attach
 ```
 
-To run server, attach first, then (inside container):
+To run server, so you can use and test:
 ```bash
-make swoole-server
+sudo make start
 ```
 Then go to http://127.0.0.1/docs and try API.
 Or click here for 3 mentioned endpoints:
@@ -30,6 +30,10 @@ http://localhost/api/directories?page=1&per_page=5,
 but you cannot exceed 100, as you can see here:
 http://localhost/api/directories?page=1&per_page=101
 
+For Production environment:
+```bash
+make start-prod
+```
 
 To run tests and static .analysis, once you are attached:
 ```bash

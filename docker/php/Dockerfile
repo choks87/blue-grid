@@ -17,8 +17,8 @@ RUN apt-get install --no-install-recommends -y libzip-dev
 RUN apt-get install --no-install-recommends -y libxml2-dev
 RUN apt-get install --no-install-recommends -y procps
 
-COPY files/bin                    /usr/local/bin/
-COPY files/ini/php.ini            /usr/local/etc/php/conf.d
+COPY docker/php/files/bin                    /usr/local/bin/
+COPY docker/php/files/ini/php.ini            /usr/local/etc/php/conf.d
 
 # PHP Extensions, via docker-php-ext-install and PECL :)
 RUN docker-php-ext-install iconv
@@ -50,7 +50,7 @@ WORKDIR /app
 
 FROM base AS development
 
-COPY files/ini/20-xdebug.ini      /usr/local/etc/php/available-ini/
+COPY docker/php/files/ini/20-xdebug.ini      /usr/local/etc/php/available-ini/
 
 # Excensions
 RUN pecl install pcov
@@ -60,29 +60,24 @@ RUN php-ext-enable xdebug
 
 
 FROM base AS production
-RUN echo -e "APP_ENV=prod\n" >> .env
-RUN echo -e "APP_SECRET" >> .env
+RUN echo -n "APP_ENV=prod\n" >> .env
+RUN echo -n "APP_SECRET=" >> .env
 RUN echo -n "$(head -c 16 /dev/urandom | xxd -p)" | sha1sum | awk '{print $1}' >> .env
 
-RUN composer install --no-dev
-RUN bin/console lexik:jwt:generate-keypair --skip-if-exists
+COPY bin /app/bin
+COPY config /app/config
+COPY public /app/public
+COPY src /app/src
+COPY translations /app/translations
+COPY composer.json /app/composer.json
+COPY composer.lock /app/composer.lock
+COPY symfony.lock /app/symfony.lock
+
+RUN composer install --no-dev --optimize-autoloader
 RUN rm -rf \
-      .env.dist \
-      .env.test \
-      .gitignore \
-      .phpunit.result.cache \
-      composer.json \
       composer.lock \
-      docker-compose.yml \
-      infection.json \
-      Makefile \
       phpmd_ruleset.xml \
-      phpstan.bootstrap.php \
-      phpstan.neon.dist \
-      phpunit.xml.dist \
-      README.md \
-      symfony.lock \
-      ./tests
+      symfony.lock
 
 CMD ["bin/console", "swoole:server:run"]
 

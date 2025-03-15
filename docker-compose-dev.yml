@@ -1,0 +1,15 @@
+services:
+  php:
+    build:
+      context: ./
+      dockerfile: docker/php/Dockerfile
+      target: development
+    volumes:
+      - ./:/app
+      - ~/.bash_history:/root/.bash_history
+    environment:
+      PHP_IDE_CONFIG: "serverName=blue-php"
+    ports:
+      - "9501:9501"
+    expose:
+      - 9000

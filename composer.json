@@ -33,7 +33,6 @@
     },
     "require-dev": {
         "dama/doctrine-test-bundle": "*",
-        "doctrine/doctrine-fixtures-bundle": "*",
         "eaglewu/swoole-ide-helper": "dev-master@dev",
         "infection/infection": "^0.27.3",
         "phpmd/phpmd": "*",

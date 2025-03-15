@@ -29,7 +29,6 @@ final class WebServerTestHook
             ['doctrine:database:drop', ['--force', '--if-exists']],
             ['doctrine:database:create', []],
             ['doctrine:schema:update', ['--force']],
-            ['doctrine:fixture:load', ['--no-interaction']],
         ];
 
         foreach ($commands as [$command, $arguments]) {
